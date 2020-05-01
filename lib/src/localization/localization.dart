@@ -27,8 +27,16 @@ class Localization {
 
   /// [localizedValues] map of code and map of values
   static Map<String, Map<String, String>> localizedValues = {
-    'en': {'hello_world': 'hello, world!!'},
-    'es': {'hello_world': 'hola, mundo!!'}
+    'en': {
+      'app_name': 'Simple Chat',
+      'hello_world': 'hello, world!!',
+      'contact_page_title': 'Contacts'
+      },
+    'es': {
+      'app_name': 'Simple Chat',
+      'hello_world': 'Hola, mundo!!',
+      'contact_page_title': 'Contactos'
+      }
   };
 
   /// get value by key in some locale
