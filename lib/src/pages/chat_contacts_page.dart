@@ -1,6 +1,7 @@
 import 'package:chat_flutter/src/base/base_stateless_screen.dart';
 import 'package:chat_flutter/src/localization/localization.dart';
 import 'package:chat_flutter/src/models/chat_contact.dart';
+import 'package:chat_flutter/src/pages/chat_conversation_page.dart';
 import 'package:flutter/material.dart';
 
 class ChatContactsPage extends BaseStatelessScreen {
@@ -17,11 +18,11 @@ class ChatContactsPage extends BaseStatelessScreen {
     List<ChatContact> contacts = ChatContactMockData.contacts;
     return ListView.builder(
       itemCount: contacts.length,
-      itemBuilder: (context, index) => _getContactCard(contacts[index]),
+      itemBuilder: (context, index) => _getContactCard(context, contacts[index]),
     );
   }
 
-  Widget _getContactCard(ChatContact contact) {
+  Widget _getContactCard(BuildContext context,ChatContact contact) {
     return Container(
       child: ListTile(
         title: Text(contact.contactName),
@@ -31,9 +32,14 @@ class ChatContactsPage extends BaseStatelessScreen {
           backgroundImage: NetworkImage(contact.imgRoute),
           radius: 20,
         ),
-        onTap: () {},
+        onTap: () => _openConversation(context, contact),
       ),
     );
+  }
+
+  /// opens Chat Conversation page 
+  void _openConversation(BuildContext context, ChatContact contact) {
+    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ChatConversationPage(contact: contact,)));
   }
 }
 
@@ -72,7 +78,7 @@ class ChatContactMockData {
     ChatContact(
         contactName: 'Alexander Hamilton',
         chatId: 5685,
-        lastMessage: 'Te veo al rato...',
+        lastMessage: 'I am not throwing away my shot',
         imgRoute:
             'https://image.cnbcfm.com/api/v1/image/103686018-GettyImages-510501068.jpg?v=1529471738&w=1400&h=950'),
   ];

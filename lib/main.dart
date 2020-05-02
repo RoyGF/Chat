@@ -12,6 +12,7 @@ class MyApp extends StatelessWidget {
       initialRoute: ChatContactsPage.pageRoute,
       routes: {
         ChatContactsPage.pageRoute : (BuildContext context) => ChatContactsPage(),
+        // ChatConversationPage.pageRoute: (BuildContext context) => ChatConversationPage(),
       },
       theme: ThemeData(primaryColor: Colors.deepPurple),
     );
