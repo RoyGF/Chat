@@ -18,11 +18,12 @@ class ChatContactsPage extends BaseStatelessScreen {
     List<ChatContact> contacts = ChatContactMockData.contacts;
     return ListView.builder(
       itemCount: contacts.length,
-      itemBuilder: (context, index) => _getContactCard(context, contacts[index]),
+      itemBuilder: (context, index) =>
+          _getContactCard(context, contacts[index]),
     );
   }
 
-  Widget _getContactCard(BuildContext context,ChatContact contact) {
+  Widget _getContactCard(BuildContext context, ChatContact contact) {
     return Container(
       child: ListTile(
         title: Text(contact.contactName),
@@ -37,9 +38,9 @@ class ChatContactsPage extends BaseStatelessScreen {
     );
   }
 
-  /// opens Chat Conversation page 
+  /// opens Chat Conversation page
   void _openConversation(BuildContext context, ChatContact contact) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context)=> ChatConversationPage(contact: contact,)));
+    Navigator.of(context).push(MaterialPageRoute(builder: (context) => ChatConversationPage(contact: contact)));
   }
 }
 

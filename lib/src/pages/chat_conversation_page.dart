@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:chat_flutter/src/base/base_stateful_screen.dart';
 import 'package:chat_flutter/src/base/base_stateful_widget.dart';
 import 'package:chat_flutter/src/models/chat_contact.dart';
+import 'package:chat_flutter/src/models/chat_message.dart';
+import 'package:chat_flutter/src/socket/chat_socket.dart';
 import 'package:flutter/material.dart';
 
 class ChatConversationPage extends BaseStatefulWidget {
@@ -18,12 +22,26 @@ class _ChatConversationPageState
   ChatContact _chatContact;
   double height, width;
   TextEditingController _textController;
+  ChatSocket chatSocket;
+  List<ChatMessage> _chatMessages = List<ChatMessage>();
+  var _senderId;
 
   @override
   void initState() {
     super.initState();
+    _senderId = "sender2";
     _chatContact = widget.contact;
+    _textController = TextEditingController();
+    chatSocket = new ChatSocket(
+      channel: _chatContact.chatId.toString(),
+      onMessageReceived: (message) => _onMessageReceived(message),
+    );
+    connectSocket();
     setState(() {});
+  }
+
+  Future<void> connectSocket() async {
+    await chatSocket.connect();
   }
 
   @override
@@ -45,7 +63,7 @@ class _ChatConversationPageState
     height = MediaQuery.of(context).size.height;
     return Column(
       children: <Widget>[
-        Expanded(child: Container()),
+        Expanded(child: _buildMessageList()),
         Divider(),
         _buildInputArea(),
         SizedBox(height: 5)
@@ -82,7 +100,85 @@ class _ChatConversationPageState
     return FloatingActionButton(
       backgroundColor: Colors.deepPurple,
       child: Icon(Icons.send),
-      onPressed: () {},
+      onPressed: _sendMessage,
     );
+  }
+
+  Widget _buildSingleMessage(ChatMessage message) {
+    return message.senderId == _senderId
+        ? _buildSenderMessage(message)
+        : _buildReceiverMessage(message);
+  }
+
+  Widget _buildSenderMessage(ChatMessage message) {
+    return Container(
+      alignment: Alignment.centerRight,
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        margin: const EdgeInsets.only(bottom: 20.0, left: 20.0),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(width: 1.0, color: Colors.deepPurple),
+            left: BorderSide(width: 1.0, color: Colors.deepPurple),
+            right: BorderSide(width: 1.0, color: Colors.deepPurple),
+            bottom: BorderSide(width: 1.0, color: Colors.deepPurple),
+          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Text(
+          message.messageBody,
+          style: TextStyle(color: Colors.black, fontSize: 15.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildReceiverMessage(ChatMessage message) {
+    return Container(
+      alignment: Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.all(20.0),
+        margin: const EdgeInsets.only(bottom: 20.0, left: 20.0),
+        decoration: BoxDecoration(
+          color: Colors.deepPurple,
+          borderRadius: BorderRadius.circular(20.0),
+        ),
+        child: Text(
+          message.messageBody,
+          style: TextStyle(color: Colors.white, fontSize: 15.0),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMessageList() {
+    return Container(
+      width: width,
+      child: ListView.builder(
+        itemCount: _chatMessages.length,
+        itemBuilder: (context, index) => _buildSingleMessage(
+          _chatMessages[index],
+        ),
+      ),
+    );
+  }
+
+  void _sendMessage() {
+    if (_textController.text.isEmpty) return;
+    ChatMessage message = ChatMessage(
+      chatId: widget.contact.chatId.toString(),
+      messageBody: _textController.text,
+      senderId: _senderId,
+    );
+    chatSocket.sendMessage(message);
+    _textController.text = "";
+  }
+
+  void _onMessageReceived(ChatMessage message) {
+    print('Callback Success!!!');
+    print(message.messageBody);
+    _chatMessages.add(message);
+    setState(() {});
   }
 }
