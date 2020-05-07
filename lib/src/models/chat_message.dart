@@ -1,3 +1,5 @@
+import 'package:chat_flutter/src/models/user.dart';
+
 import 'dart:convert';
 
 ChatMessage chatMessageFromJson(String str) =>
@@ -8,31 +10,27 @@ String chatMessageToJson(ChatMessage data) => json.encode(data.toJson());
 class ChatMessage {
   String id;
   String chatId;
-  String senderId;
-  String messageBody;
-  String imgRoute;
+  User author;
+  String body;
 
   ChatMessage({
     this.id,
     this.chatId,
-    this.senderId,
-    this.messageBody,
-    this.imgRoute,
+    this.author,
+    this.body,
   });
 
   factory ChatMessage.fromJson(Map<String, dynamic> json) => ChatMessage(
         id: json["id"],
         chatId: json["chat_id"],
-        senderId: json["sender_id"],
-        messageBody: json["message_body"],
-        imgRoute: json["img_route"],
+        author: User.fromJson(json["author"]),
+        body: json["body"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "chat_id": chatId,
-        "sender_id": senderId,
-        "message_body": messageBody,
-        "img_route": imgRoute,
+        "author": author.toJson(),
+        "body": body,
       };
 }

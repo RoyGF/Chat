@@ -4,7 +4,7 @@ import 'package:chat_flutter/src/base/base_socket.dart';
 import 'package:meta/meta.dart';
 
 const CHAT_MESSAGE_EVENT = 'chat-message-event';
-const SOCKET_URL = "http://155.138.215.86:3000";
+const SOCKET_URL = "http://192.168.1.70:3000";
 
 typedef MessageCallback(ChatMessage message);
 
@@ -20,7 +20,7 @@ class ChatSocket extends BaseSocket {
   @override
   Future<void> connect() async {
     try {
-      print('connecting to ${SOCKET_URL}');
+      print('connecting to $SOCKET_URL');
       socket = socketIO.io(SOCKET_URL, <String, dynamic>{
         'transports': ['websocket'],
       });
@@ -33,6 +33,7 @@ class ChatSocket extends BaseSocket {
       socket.on(_streamChannel, (data) {
         onReceive(_streamChannel, data);
       });
+      
     } catch (e) {
       onError('disconnect, error: ${e.toString()}');
       closeSocket();

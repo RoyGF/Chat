@@ -1,9 +1,8 @@
-import 'dart:math';
-
 import 'package:chat_flutter/src/base/base_stateful_screen.dart';
 import 'package:chat_flutter/src/base/base_stateful_widget.dart';
 import 'package:chat_flutter/src/models/chat_contact.dart';
 import 'package:chat_flutter/src/models/chat_message.dart';
+import 'package:chat_flutter/src/models/user.dart';
 import 'package:chat_flutter/src/socket/chat_socket.dart';
 import 'package:flutter/material.dart';
 
@@ -29,7 +28,7 @@ class _ChatConversationPageState
   @override
   void initState() {
     super.initState();
-    _senderId = "sender2";
+    _senderId = "sender1";
     _chatContact = widget.contact;
     _textController = TextEditingController();
     chatSocket = new ChatSocket(
@@ -38,10 +37,6 @@ class _ChatConversationPageState
     );
     connectSocket();
     setState(() {});
-  }
-
-  Future<void> connectSocket() async {
-    await chatSocket.connect();
   }
 
   @override
@@ -105,7 +100,7 @@ class _ChatConversationPageState
   }
 
   Widget _buildSingleMessage(ChatMessage message) {
-    return message.senderId == _senderId
+    return message.author.id == _senderId
         ? _buildSenderMessage(message)
         : _buildReceiverMessage(message);
   }
@@ -127,7 +122,7 @@ class _ChatConversationPageState
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Text(
-          message.messageBody,
+          message.body,
           style: TextStyle(color: Colors.black, fontSize: 15.0),
         ),
       ),
@@ -139,13 +134,13 @@ class _ChatConversationPageState
       alignment: Alignment.centerLeft,
       child: Container(
         padding: const EdgeInsets.all(20.0),
-        margin: const EdgeInsets.only(bottom: 20.0, left: 20.0),
+        margin: const EdgeInsets.only(bottom: 20.0, right: 20.0),
         decoration: BoxDecoration(
           color: Colors.deepPurple,
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Text(
-          message.messageBody,
+          message.body,
           style: TextStyle(color: Colors.white, fontSize: 15.0),
         ),
       ),
@@ -164,12 +159,20 @@ class _ChatConversationPageState
     );
   }
 
+  Future<void> connectSocket() async {
+    await chatSocket.connect();
+  }
+
   void _sendMessage() {
     if (_textController.text.isEmpty) return;
+    User user = User(
+      id: "ioioio",
+      name: 'Roy',
+    );
     ChatMessage message = ChatMessage(
       chatId: widget.contact.chatId.toString(),
-      messageBody: _textController.text,
-      senderId: _senderId,
+      body: _textController.text,
+      author: user,
     );
     chatSocket.sendMessage(message);
     _textController.text = "";
@@ -177,7 +180,7 @@ class _ChatConversationPageState
 
   void _onMessageReceived(ChatMessage message) {
     print('Callback Success!!!');
-    print(message.messageBody);
+    print(message.body);
     _chatMessages.add(message);
     setState(() {});
   }

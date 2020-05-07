@@ -15,6 +15,7 @@ abstract class BaseSocket {
   /// should be overriden by class
   Future<void> onReceive(event, data);
 
+  /// closes socket in case it is open
   void closeSocket() {
     if (socket != null) {
       socket.close();

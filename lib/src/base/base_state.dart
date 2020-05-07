@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:chat_flutter/src/base/base_bloc_provider.dart';
+import 'package:chat_flutter/src/base/base_contract.dart';
 import 'package:chat_flutter/src/base/base_stateful_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
