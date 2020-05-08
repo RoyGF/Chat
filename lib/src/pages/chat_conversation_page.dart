@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:chat_flutter/src/base/base_stateful_screen.dart';
 import 'package:chat_flutter/src/base/base_stateful_widget.dart';
+import 'package:chat_flutter/src/managers/user_manager.dart';
 import 'package:chat_flutter/src/models/chat_contact.dart';
 import 'package:chat_flutter/src/models/chat_message.dart';
 import 'package:chat_flutter/src/models/user.dart';
@@ -21,16 +24,18 @@ class _ChatConversationPageState
   ChatContact _chatContact;
   double height, width;
   TextEditingController _textController;
+  ScrollController _scrollController;
   ChatSocket chatSocket;
   List<ChatMessage> _chatMessages = List<ChatMessage>();
-  var _senderId;
+  User _user;
 
   @override
   void initState() {
     super.initState();
-    _senderId = "sender1";
+    setUser();
     _chatContact = widget.contact;
     _textController = TextEditingController();
+    _scrollController = ScrollController();
     chatSocket = new ChatSocket(
       channel: _chatContact.chatId.toString(),
       onMessageReceived: (message) => _onMessageReceived(message),
@@ -100,7 +105,7 @@ class _ChatConversationPageState
   }
 
   Widget _buildSingleMessage(ChatMessage message) {
-    return message.author.id == _senderId
+    return message.author.name == _user.name
         ? _buildSenderMessage(message)
         : _buildReceiverMessage(message);
   }
@@ -109,8 +114,8 @@ class _ChatConversationPageState
     return Container(
       alignment: Alignment.centerRight,
       child: Container(
-        padding: const EdgeInsets.all(20.0),
-        margin: const EdgeInsets.only(bottom: 20.0, left: 20.0),
+        padding: const EdgeInsets.all(15.0),
+        margin: const EdgeInsets.only(bottom: 10.0, right: 10.0),
         decoration: BoxDecoration(
           border: Border(
             top: BorderSide(width: 1.0, color: Colors.deepPurple),
@@ -133,8 +138,8 @@ class _ChatConversationPageState
     return Container(
       alignment: Alignment.centerLeft,
       child: Container(
-        padding: const EdgeInsets.all(20.0),
-        margin: const EdgeInsets.only(bottom: 20.0, right: 20.0),
+        padding: const EdgeInsets.all(15.0),
+        margin: const EdgeInsets.only(bottom: 10.0, left: 10.0),
         decoration: BoxDecoration(
           color: Colors.deepPurple,
           borderRadius: BorderRadius.circular(20.0),
@@ -150,7 +155,9 @@ class _ChatConversationPageState
   Widget _buildMessageList() {
     return Container(
       width: width,
+      padding: EdgeInsets.only(top: 5.0),
       child: ListView.builder(
+        controller: _scrollController,
         itemCount: _chatMessages.length,
         itemBuilder: (context, index) => _buildSingleMessage(
           _chatMessages[index],
@@ -163,16 +170,17 @@ class _ChatConversationPageState
     await chatSocket.connect();
   }
 
+  Future<void> setUser() async {
+    UserManager manager = UserManager();
+    _user = await manager.getUser();
+  }
+
   void _sendMessage() {
     if (_textController.text.isEmpty) return;
-    User user = User(
-      id: "ioioio",
-      name: 'Roy',
-    );
     ChatMessage message = ChatMessage(
       chatId: widget.contact.chatId.toString(),
       body: _textController.text,
-      author: user,
+      author: _user,
     );
     chatSocket.sendMessage(message);
     _textController.text = "";
@@ -180,8 +188,16 @@ class _ChatConversationPageState
 
   void _onMessageReceived(ChatMessage message) {
     print('Callback Success!!!');
-    print(message.body);
+    print(chatMessageToJson(message));
     _chatMessages.add(message);
     setState(() {});
+    scrollToBottom();
+  }
+
+  void scrollToBottom() {
+    Timer(
+        Duration(milliseconds: 300),
+        () => _scrollController
+            .jumpTo(_scrollController.position.maxScrollExtent+0.1));
   }
 }

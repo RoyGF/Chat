@@ -1,8 +1,5 @@
 import 'dart:async';
 
-import 'package:chat_flutter/src/managers/user_manager.dart';
-import 'package:chat_flutter/src/models/user.dart';
-
 import 'package:rxdart/rxdart.dart';
 import 'package:rxdart/subjects.dart';
 
