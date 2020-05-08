@@ -195,9 +195,7 @@ class _ChatConversationPageState
   }
 
   void scrollToBottom() {
-    Timer(
-        Duration(milliseconds: 300),
-        () => _scrollController
-            .jumpTo(_scrollController.position.maxScrollExtent+0.1));
+    Timer( Duration(milliseconds: 300),
+        () => _scrollController.jumpTo(_scrollController.position.maxScrollExtent+0.1));
   }
 }

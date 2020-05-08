@@ -43,6 +43,7 @@ class ChatSocket extends BaseSocket {
   @override
   Future<void> onReceive(event, data) async {
     ChatMessage message = chatMessageFromJson(data);
+    print(message);
     addChatMessage(message);
   }
 

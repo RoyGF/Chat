@@ -28,7 +28,7 @@ class ChatMessage {
       );
 
   Map<String, dynamic> toJson() => {
-        "id": id,
+        "_id": id,
         "chat_id": chatId,
         "author": author.toJson(),
         "body": body,
