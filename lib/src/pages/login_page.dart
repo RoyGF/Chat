@@ -1,6 +1,7 @@
 import 'package:chat_flutter/src/base/base_stateless_screen.dart';
 import 'package:chat_flutter/src/bloc/bloc_provider.dart';
 import 'package:chat_flutter/src/bloc/login_bloc.dart';
+import 'package:chat_flutter/src/managers/user_manager.dart';
 import 'package:chat_flutter/src/pages/chat_contacts_page.dart';
 import 'package:flutter/material.dart';
 
@@ -87,22 +88,16 @@ class LoginPage extends BaseStatelessScreen {
             child: Column(
               children: <Widget>[
                 Text(
-                  'Log in',
-                  style: TextStyle(
-                    fontSize: 30.0,
-                    fontWeight: FontWeight.w200
-                  ),
+                  'Chat App Flutter',
+                  style: TextStyle(fontSize: 30.0, fontWeight: FontWeight.w300),
                 ),
                 SizedBox(height: 60.0),
-                _crearEmail(bloc),
-                SizedBox(height: 30.0),
-                _crearPassword(bloc),
+                _buildNameField(bloc),
                 SizedBox(height: 30.0),
                 _crearBoton(bloc)
               ],
             ),
           ),
-          Text('Forgot Password?'),
           SizedBox(
             height: 100.0,
           )
@@ -111,9 +106,9 @@ class LoginPage extends BaseStatelessScreen {
     );
   }
 
-  Widget _crearEmail(LoginBloc bloc) {
+  Widget _buildNameField(LoginBloc bloc) {
     return StreamBuilder(
-      stream: bloc.emailStream,
+      stream: bloc.formValidName,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return Container(
           padding: EdgeInsets.symmetric(horizontal: 20.0),
@@ -121,38 +116,14 @@ class LoginPage extends BaseStatelessScreen {
             keyboardType: TextInputType.emailAddress,
             decoration: InputDecoration(
               icon: Icon(
-                Icons.alternate_email,
+                Icons.person,
                 color: Colors.deepPurple,
               ),
-              hintText: 'ejemplo@correo.com',
-              labelText: 'Correo electrónico',
+              hintText: 'Roy',
+              labelText: 'Name',
               errorText: snapshot.error,
             ),
-            onChanged: (value) => bloc.changeEmail(value),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _crearPassword(LoginBloc bloc) {
-    return StreamBuilder(
-      stream: bloc.passwordStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 20.0),
-          child: TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              icon: Icon(
-                Icons.lock_outline,
-                color: Colors.deepPurple,
-              ),
-              labelText: 'Contraseña',
-              counterText: snapshot.data,
-              errorText: snapshot.error,
-            ),
-            onChanged: (value) => bloc.changePassword(value),
+            onChanged: (value) => bloc.changeName(value),
           ),
         );
       },
@@ -161,7 +132,7 @@ class LoginPage extends BaseStatelessScreen {
 
   Widget _crearBoton(LoginBloc bloc) {
     return StreamBuilder(
-      stream: bloc.formValidStream,
+      stream: bloc.formValidName,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return RaisedButton(
           child: Container(
@@ -182,13 +153,17 @@ class LoginPage extends BaseStatelessScreen {
           elevation: 0.0,
           color: Colors.deepPurple,
           textColor: Colors.white,
-          onPressed: snapshot.hasData ? () => _login(context, bloc) : null,
+          onPressed: snapshot.hasData
+              ? () => _login(context, snapshot.data.toString())
+              : null,
         );
       },
     );
   }
 
-  _login(BuildContext context, LoginBloc bloc) {
+  _login(BuildContext context, String userName) {
+    UserManager manager = UserManager();
+    manager.saveUser(userName);
     Navigator.pushReplacementNamed(context, ChatContactsPage.pageRoute);
   }
 }
